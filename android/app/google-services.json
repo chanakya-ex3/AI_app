@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1094993833277",
+    "project_id": "aiapp-15644",
+    "storage_bucket": "aiapp-15644.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1094993833277:android:14f31d9f5f6905e7382954",
+        "android_client_info": {
+          "package_name": "com.example.ai_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl0V0xTY_rdZ40-ADlwI4k1tEXN17JDm8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
