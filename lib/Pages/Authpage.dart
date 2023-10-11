@@ -9,6 +9,7 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   static bool isLoggedIn = true;
+  static bool _obscureText = true;
   static String dynamicName = "";
   static String name = "";
   static String email = "";
@@ -55,16 +56,24 @@ class _AuthPageState extends State<AuthPage> {
                             children: [
                               SizedBox(height: 30),
                               Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      "Welcome " + dynamicName,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 35,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.9,
+                                      child: Center(
+                                        child: Text(
+                                          isLoggedIn
+                                              ? "Welcome " + dynamicName
+                                              : "Sign Up",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 35,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ]),
@@ -80,7 +89,7 @@ class _AuthPageState extends State<AuthPage> {
                               SizedBox(height: 10),
                               Container(
                                 width: MediaQuery.of(context).size.width *
-                                    0.9, // Set the desired width here
+                                    0.8, // Set the desired width here
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).colorScheme.tertiary,
                                   // border: Border.all(color: Colors.grey),
@@ -96,12 +105,12 @@ class _AuthPageState extends State<AuthPage> {
                                 ),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      vertical: 5, horizontal: 10),
+                                      horizontal: 10),
                                   child: TextFormField(
                                     // validator: ,
                                     decoration: InputDecoration(
-                                      label: Text("Email Address"),
-                                      hintText: "Enter email",
+                                      label: Text("Username"),
+                                      hintText: "Enter Email Address",
                                       border: InputBorder.none,
                                     ),
                                     validator: (value) {
@@ -132,7 +141,7 @@ class _AuthPageState extends State<AuthPage> {
                               !isLoggedIn
                                   ? Container(
                                       width: MediaQuery.of(context).size.width *
-                                          0.9, // Set the desired width here
+                                          0.8, // Set the desired width here
                                       decoration: BoxDecoration(
                                           color: Theme.of(context)
                                               .colorScheme
@@ -148,7 +157,7 @@ class _AuthPageState extends State<AuthPage> {
                                           ]),
                                       child: Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            vertical: 5, horizontal: 10),
+                                            horizontal: 10),
                                         child: TextFormField(
                                           onSaved: (newValue) {
                                             name = newValue!;
@@ -188,7 +197,7 @@ class _AuthPageState extends State<AuthPage> {
                                     ),
                               Container(
                                 width: MediaQuery.of(context).size.width *
-                                    0.9, // Set the desired width here
+                                    0.8, // Set the desired width here
                                 // height: MediaQuery.of(context).size.height *
                                 //     0.11, // Set the desired height here
                                 decoration: BoxDecoration(
@@ -223,8 +232,18 @@ class _AuthPageState extends State<AuthPage> {
                                       label: Text("Password"),
                                       hintText: "Enter password",
                                       border: InputBorder.none,
+                                      suffixIcon: IconButton(
+                                        icon: Icon(_obscureText
+                                            ? Icons.visibility_rounded
+                                            : Icons.visibility_off_rounded),
+                                        onPressed: () {
+                                          setState(() {
+                                            _obscureText = !_obscureText;
+                                          });
+                                        },
+                                      ),
                                     ),
-                                    obscureText: true,
+                                    obscureText: _obscureText,
                                     autocorrect: false,
                                   ),
                                 ),
@@ -267,7 +286,7 @@ class _AuthPageState extends State<AuthPage> {
                                         width: MediaQuery.of(context)
                                                 .size
                                                 .width *
-                                            0.9, // Set the desired width here
+                                            0.70, // Set the desired width here
                                         height:
                                             MediaQuery.of(context).size.height *
                                                 0.09,
@@ -303,6 +322,7 @@ class _AuthPageState extends State<AuthPage> {
                                             onPressed: () {
                                               setState(() {
                                                 isLoggedIn = !isLoggedIn;
+                                                _obscureText = true;
                                                 dynamicName = "";
                                                 _key.currentState!.reset();
                                               });
