@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
@@ -8,6 +10,8 @@ class AuthPage extends StatefulWidget {
 }
 
 class _AuthPageState extends State<AuthPage> {
+  final _auth = FirebaseAuth.instance;
+  static bool isuploadingAuth = false;
   static bool isLoggedIn = true;
   static bool _obscureText = true;
   static String dynamicName = "";
@@ -16,9 +20,45 @@ class _AuthPageState extends State<AuthPage> {
   static String password = "";
   final _key = new GlobalKey<FormState>();
 
-  void submit() {
+  Future<void> submit() async {
     if (_key.currentState!.validate()) {
       _key.currentState!.save();
+      if (isLoggedIn) {
+        try {
+          final userCredentials = await _auth.signInWithEmailAndPassword(
+              email: email, password: password);
+          isLoggedIn = true;
+          bool _obscureText = true;
+          dynamicName = "";
+          name = "";
+          email = "";
+          password = "";
+        } on FirebaseAuthException catch (e) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Invalid mail or password")));
+        }
+      } else {
+        try {
+          final userCredentials = await _auth.createUserWithEmailAndPassword(
+              email: email, password: password);
+          FirebaseFirestore.instance
+              .collection("usernames")
+              .doc('${userCredentials.user!.uid}')
+              .set({'Name': name});
+          isLoggedIn = true;
+          bool _obscureText = true;
+          dynamicName = "";
+          name = "";
+          email = "";
+          password = "";
+        } on FirebaseAuthException catch (e) {
+          ScaffoldMessenger.of(context).clearSnackBars();
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Invalid mail or password. Try again")));
+        }
+      }
+
       isLoggedIn ? print("login") : print(name);
       print(email);
       print(password);
@@ -124,7 +164,7 @@ class _AuthPageState extends State<AuthPage> {
                                               dynamicName =
                                                   getTextBeforeAt(value);
                                             })
-                                          : print('not email');
+                                          : print('');
                                     },
                                     onSaved: (newValue) {
                                       email = newValue!;
@@ -273,7 +313,15 @@ class _AuthPageState extends State<AuthPage> {
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
                                   ElevatedButton(
-                                      onPressed: () => submit(),
+                                      onPressed: () async {
+                                        setState(() {
+                                          isuploadingAuth = true;
+                                        });
+                                        await submit();
+                                        setState(() {
+                                          isuploadingAuth = false;
+                                        });
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Theme.of(context)
                                             .colorScheme
@@ -291,17 +339,25 @@ class _AuthPageState extends State<AuthPage> {
                                             MediaQuery.of(context).size.height *
                                                 0.09,
                                         child: Center(
-                                          child: Text(
-                                            isLoggedIn ? "Login" : "Register",
-                                            style: TextStyle(
-                                              color: Colors.white,
+                                          child: isuploadingAuth
+                                              ? CircularProgressIndicator(
+                                                  valueColor:
+                                                      AlwaysStoppedAnimation<
+                                                          Color>(Colors.white),
+                                                )
+                                              : Text(
+                                                  isLoggedIn
+                                                      ? "Login"
+                                                      : "Register",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
 
-                                              fontSize:
-                                                  24, // Adjust the font size as needed
-                                              fontWeight: FontWeight
-                                                  .bold, // Make the text bold),
-                                            ),
-                                          ),
+                                                    fontSize:
+                                                        24, // Adjust the font size as needed
+                                                    fontWeight: FontWeight
+                                                        .bold, // Make the text bold),
+                                                  ),
+                                                ),
                                         ),
                                       )),
                                   SizedBox(
