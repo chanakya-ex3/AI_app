@@ -1,3 +1,4 @@
+import 'package:ai_app/MyRoutes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -311,8 +312,10 @@ class _HomepageState extends State<Homepage> {
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.08,
                       borderRadius: 15,
-                      onSubmit: () {},
-                      text: "Get Started",
+                      onSubmit: () {
+                        Navigator.pushReplacementNamed(context, MyRoutes.chat);
+                      },
+                      text: "Swipe to Explore",
                       textStyle: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                           fontSize: 20,

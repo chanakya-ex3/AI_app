@@ -1,5 +1,6 @@
 import 'package:ai_app/Pages/Authpage.dart';
 import 'package:ai_app/MyRoutes.dart';
+import 'package:ai_app/Pages/Chat.dart';
 import 'package:ai_app/Pages/Homepage.dart';
 import 'package:ai_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -46,7 +47,8 @@ class _AiAPPState extends State<AiAPP> {
                 brightness: Brightness.light)),
         routes: {
           MyRoutes.auth: (context) => AuthPage(),
-          MyRoutes.home: (context) => Homepage()
+          MyRoutes.home: (context) => Homepage(),
+          MyRoutes.chat: (context) => ChatPage(),
         },
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
