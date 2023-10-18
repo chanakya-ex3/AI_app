@@ -1,6 +1,7 @@
 import 'package:ai_app/Widgets/threedots.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 class MessageBubble extends StatefulWidget {
   Map<String, String> data;
@@ -12,8 +13,30 @@ class MessageBubble extends StatefulWidget {
 }
 
 class _MessageBubbleState extends State<MessageBubble> {
+  FlutterTts flutterTts = FlutterTts();
+
+  void speak(String text) async {
+    print(text);
+    await flutterTts.setLanguage("en-US");
+    await flutterTts.setPitch(1);
+    await flutterTts.speak(text);
+  }
+
+  @override
+  void initState() {
+
+    // widget.data["type"] == "voice" && widget.data["response"] == ""
+    //     ? speak(widget.data["response"]!)
+    //     : null;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // widget.data["type"] == "voice" && widget.data["response"] == ""
+    //     ? speak(widget.data["response"]!)
+    //     : null;
+    // super.initState();
     return Container(
       child: Column(
         children: [
@@ -34,7 +57,7 @@ class _MessageBubbleState extends State<MessageBubble> {
                   ),
                 )),
           ),
-          widget.data["type"] == "text"
+          (widget.data["type"] == "text" || widget.data["type"] == "voice")
               ? Align(
                   alignment: Alignment.centerLeft,
                   child: Container(

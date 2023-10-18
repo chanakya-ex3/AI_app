@@ -54,7 +54,7 @@ class _NewMessageState extends State<NewMessage> {
     }
   }
 
-  void submit() async {
+  void submit(String type) async {
     query = _controller.text;
 
     if (query.isNotEmpty && query != "" && query.trim().isNotEmpty) {
@@ -76,7 +76,7 @@ class _NewMessageState extends State<NewMessage> {
           "query": query,
           "uid": FirebaseAuth.instance.currentUser!.uid,
           "response": "",
-          "type": "text",
+          "type": type,
           "category": NewMessage.historyid,
           "time": Timestamp.now(),
         });
@@ -101,7 +101,6 @@ class _NewMessageState extends State<NewMessage> {
             .showSnackBar(SnackBar(content: Text("Invalid mail or password")));
       }
       print("done");
-      
     }
   }
 
@@ -111,14 +110,21 @@ class _NewMessageState extends State<NewMessage> {
     setState(() {});
   }
 
-  void _startListening() async {
+  Future<void> _startListening() async {
     await _speechToText.listen(onResult: _onSpeechResult);
-    setState(() {});
+    if (_speechToText.isNotListening) {
+      print("stopped");
+    }
   }
 
-  void _stopListening() async {
+  Future<void> _stopListening() async {
+    print("stopped 1");
     await _speechToText.stop();
+    print("stopped 2");
     setState(() {});
+    print("stopped 3");
+    submit("voice");
+    print("stopped 4");
   }
 
   void _onSpeechResult(SpeechRecognitionResult result) {
@@ -126,6 +132,10 @@ class _NewMessageState extends State<NewMessage> {
     setState(() {
       _controller.text = result.recognizedWords;
     });
+    if (_speechToText.isNotListening) {
+      print("stopped 5");
+      submit("voice");
+    }
   }
 
   @override
@@ -147,7 +157,6 @@ class _NewMessageState extends State<NewMessage> {
           child: TextField(
             onChanged: (value) {
               query = value;
-              print(query);
               setState(() {
                 if (query.isEmpty) {
                   isQueryExmpty = true;
@@ -165,20 +174,20 @@ class _NewMessageState extends State<NewMessage> {
               hintText: 'Type a message',
               hintStyle: TextStyle(color: Colors.white),
               suffixIcon: isQueryExmpty
-                  ? 
-                  IconButton(
-                      onPressed:
-                        // If not yet listening for speech start, otherwise stop
+                  ? IconButton(
+                      onPressed: () async {
                         _speechToText.isNotListening
-                            ? _startListening
-                            : _stopListening,
-                    tooltip: 'Listen',
-                    icon: Icon(_speechToText.isNotListening
-                        ? Icons.mic_off
-                        : Icons.mic),)
+                            ? await _startListening()
+                            : await _stopListening();
+                      },
+                      tooltip: 'Listen',
+                      icon: Icon(_speechToText.isNotListening
+                          ? Icons.mic_off
+                          : Icons.mic),
+                    )
                   : IconButton(
                       onPressed: () {
-                        submit();
+                        submit("text");
                       },
                       icon: Icon(
                         Icons.send,
