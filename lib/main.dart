@@ -3,6 +3,7 @@ import 'package:ai_app/MyRoutes.dart';
 import 'package:ai_app/Pages/Chat.dart';
 import 'package:ai_app/Pages/Homepage.dart';
 import 'package:ai_app/Pages/Settings.dart';
+import 'package:ai_app/Pages/SplashScreen.dart';
 import 'package:ai_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -68,13 +69,14 @@ class _AiAPPState extends State<AiAPP> {
           MyRoutes.auth: (context) => AuthPage(),
           MyRoutes.home: (context) => Homepage(),
           MyRoutes.chat: (context) => ChatPage(),
+          MyRoutes.splashScreen: (context) => SplashScreen(),
           MyRoutes.settings: (context) => SettingsPage(),
         },
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Homepage();
+              return SplashScreen();
             }
             if (snapshot.hasError) {
               ScaffoldMessenger.of(context).clearSnackBars();

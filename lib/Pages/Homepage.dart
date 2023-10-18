@@ -88,14 +88,14 @@ class _HomepageState extends State<Homepage> {
                                       .orderBy("time", descending: true)
                                       .snapshots(),
                                   builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                        ),
-                                      );
-                                    }
+                                    // if (snapshot.connectionState ==
+                                    //     ConnectionState.waiting) {
+                                    //   return Center(
+                                    //     child: CircularProgressIndicator(
+                                    //       color: Colors.white,
+                                    //     ),
+                                    //   );
+                                    // }
                                     if (!snapshot.hasData ||
                                         snapshot.data!.docs.isEmpty) {
                                       return Center(
@@ -119,6 +119,12 @@ class _HomepageState extends State<Homepage> {
                                       itemCount: snapshot.data!.docs.length,
                                       itemBuilder: (context, index) {
                                         return ListTile(
+                                            onTap: () {
+                                              Navigator.pushNamed(
+                                                  context, MyRoutes.chat,
+                                                  arguments: snapshot
+                                                      .data!.docs[index].id);
+                                            },
                                             leading: Icon(
                                               CupertinoIcons.chat_bubble_2,
                                               color: Colors.white,

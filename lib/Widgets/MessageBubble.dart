@@ -1,3 +1,4 @@
+import 'package:ai_app/Widgets/threedots.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -43,20 +44,34 @@ class _MessageBubbleState extends State<MessageBubble> {
                       child: Card(
                           color: Colors.white,
                           child: ListTile(
-                            leading: Image.asset(
-                              'assets/images/chatgpt.png',
-                              width: 20,
-                            ),
-                            title: Text(
-                              "ChatGPT",
-                              style: TextStyle(color: Colors.black),
+                            // leading:
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Image.asset(
+                                  'assets/images/chatgpt.png',
+                                  width: 20,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text(
+                                  "ChatGPT",
+                                  style: TextStyle(color: Colors.black),
+                                ),
+                              ],
                             ),
                             subtitle: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                widget.data["response"]!,
-                                style: TextStyle(color: Colors.black),
-                              ),
+                              child: widget.data["response"] == ""
+                                  ? Center(
+                                      child: ThreeDots(),
+                                    )
+                                  : Text(
+                                      widget.data["response"]!,
+                                      style: TextStyle(color: Colors.black),
+                                    ),
                             ),
                           ))),
                 )

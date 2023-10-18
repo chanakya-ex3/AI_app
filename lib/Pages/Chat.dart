@@ -103,14 +103,14 @@ class _ChatPageState extends State<ChatPage> {
                                       .orderBy("time", descending: true)
                                       .snapshots(),
                                   builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          color: Colors.white,
-                                        ),
-                                      );
-                                    }
+                                    // if (snapshot.connectionState ==
+                                    //     ConnectionState.waiting) {
+                                    //   return Center(
+                                    //     child: CircularProgressIndicator(
+                                    //       color: Colors.white,
+                                    //     ),
+                                    //   );
+                                    // }
                                     if (!snapshot.hasData ||
                                         snapshot.data!.docs.isEmpty) {
                                       return Center(
@@ -249,14 +249,14 @@ class _ChatPageState extends State<ChatPage> {
                           .orderBy("time", descending: true)
                           .snapshots(),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          );
-                        }
+                        // if (snapshot.connectionState ==
+                        //     ConnectionState.waiting) {
+                        //   return Center(
+                        //     child: CircularProgressIndicator(
+                        //       color: Theme.of(context).colorScheme.secondary,
+                        //     ),
+                        //   );
+                        // }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                           return ListView(
                             reverse: true,
@@ -314,7 +314,9 @@ class _ChatPageState extends State<ChatPage> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
-                  NewMessage(history: historyid,)
+                  NewMessage(
+                    history: historyid,
+                  )
                 ],
               )
             : Center(
