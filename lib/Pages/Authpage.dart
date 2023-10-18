@@ -14,6 +14,7 @@ class _AuthPageState extends State<AuthPage> {
   static bool isuploadingAuth = false;
   static bool isLoggedIn = true;
   static bool _obscureText = true;
+  static bool isDark = false;
   static String dynamicName = "";
   static String name = "";
   static String email = "";
@@ -78,6 +79,20 @@ class _AuthPageState extends State<AuthPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          actions: [
+            IconButton(
+              icon: Icon(
+                  isDark ? Icons.brightness_4 : Icons.brightness_2_outlined),
+              onPressed: () {
+                setState(() {
+                  isDark = !isDark;
+                });
+              },
+            )
+          ],
+        ),
         body: Center(
           child: SingleChildScrollView(
             child:
@@ -190,7 +205,7 @@ class _AuthPageState extends State<AuthPage> {
                                               10.0), // Add rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Colors.grey,
+                                              color: Theme.of(context).colorScheme.onPrimary,
                                               blurRadius: 5.0,
                                               offset: Offset(0.0, 5.0),
                                             ),
@@ -318,9 +333,7 @@ class _AuthPageState extends State<AuthPage> {
                                           isuploadingAuth = true;
                                         });
                                         await submit();
-                                        setState(() {
-                                          isuploadingAuth = false;
-                                        });
+                                        isuploadingAuth = false;
                                       },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Theme.of(context)

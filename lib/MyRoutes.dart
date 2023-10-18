@@ -3,4 +3,5 @@ class MyRoutes {
   static String home = '/home';
   static String splashScreen = '/splash';
   static String chat = '/chat';
+  static String settings = '/settings';
 }

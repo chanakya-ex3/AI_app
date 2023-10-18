@@ -2,6 +2,7 @@ import 'package:ai_app/Pages/Authpage.dart';
 import 'package:ai_app/MyRoutes.dart';
 import 'package:ai_app/Pages/Chat.dart';
 import 'package:ai_app/Pages/Homepage.dart';
+import 'package:ai_app/Pages/Settings.dart';
 import 'package:ai_app/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -28,6 +29,7 @@ class _AiAPPState extends State<AiAPP> {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'BijuGPT',
+        themeMode: ThemeMode.system,
         theme: ThemeData().copyWith(
             useMaterial3: true,
             colorScheme: ColorScheme.fromSeed(
@@ -45,10 +47,28 @@ class _AiAPPState extends State<AiAPP> {
                 error: Colors.red,
                 onError: Colors.white,
                 brightness: Brightness.light)),
+        darkTheme: ThemeData().copyWith(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(
+                seedColor: Colors.white,
+                primary: Colors.white,
+                secondary: const Color.fromARGB(255, 180, 0, 75),
+                tertiary: Colors.white70,
+                onPrimary: Colors.transparent,
+                onSecondary: Colors.black,
+                onTertiary: Colors.black,
+                surface: Colors.black,
+                onSurface: Colors.white,
+                background: Colors.black,
+                onBackground: Colors.white,
+                error: Colors.red,
+                onError: Colors.white,
+                brightness: Brightness.dark)),
         routes: {
           MyRoutes.auth: (context) => AuthPage(),
           MyRoutes.home: (context) => Homepage(),
           MyRoutes.chat: (context) => ChatPage(),
+          MyRoutes.settings: (context) => SettingsPage(),
         },
         home: StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),

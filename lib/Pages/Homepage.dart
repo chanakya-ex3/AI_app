@@ -1,4 +1,6 @@
 import 'package:ai_app/MyRoutes.dart';
+import 'package:ai_app/main.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -17,6 +19,7 @@ class Homepage extends StatefulWidget {
 class _HomepageState extends State<Homepage> {
   String name = "";
   bool isLoaded = false;
+  bool isDark = false;
 
   Future<String> getDocByID(String id) async {
     final nameD = await _firestore.collection("usernames").doc(id).get();
@@ -41,6 +44,7 @@ class _HomepageState extends State<Homepage> {
   Widget build(BuildContext context) {
     return Scaffold(
         // menu like drawer
+        backgroundColor: Theme.of(context).colorScheme.background,
         drawer: Drawer(
           backgroundColor: Colors.black,
           child: ListView(
@@ -75,25 +79,63 @@ class _HomepageState extends State<Homepage> {
                         Container(
                           height: MediaQuery.of(context).size.height * 0.63,
                           child: isLoaded
-                              ? ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: BouncingScrollPhysics(),
-                                  itemCount: 20,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                        leading: Icon(
-                                          CupertinoIcons.chat_bubble_2,
+                              ? StreamBuilder(
+                                  stream: FirebaseFirestore.instance
+                                      .collection("history")
+                                      .where("uid",
+                                          isEqualTo: FirebaseAuth
+                                              .instance.currentUser!.uid)
+                                      .orderBy("time", descending: true)
+                                      .snapshots(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: CircularProgressIndicator(
                                           color: Colors.white,
                                         ),
-                                        title: Text(
-                                          "Chat $index",
+                                      );
+                                    }
+                                    if (!snapshot.hasData ||
+                                        snapshot.data!.docs.isEmpty) {
+                                      return Center(
+                                        child: Text(
+                                          "No Past Chats",
                                           style: TextStyle(color: Colors.white),
                                         ),
-                                        trailing: Icon(
-                                          CupertinoIcons.delete_simple,
-                                          color: Colors.white,
-                                          size: 20,
-                                        ));
+                                      );
+                                    }
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: Text(
+                                          "Error Occured",
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      );
+                                    }
+                                    return ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: BouncingScrollPhysics(),
+                                      itemCount: snapshot.data!.docs.length,
+                                      itemBuilder: (context, index) {
+                                        return ListTile(
+                                            leading: Icon(
+                                              CupertinoIcons.chat_bubble_2,
+                                              color: Colors.white,
+                                            ),
+                                            title: Text(
+                                              snapshot.data!.docs[index]
+                                                  ["heading"],
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            trailing: Icon(
+                                              CupertinoIcons.delete_simple,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ));
+                                      },
+                                    );
                                   },
                                 )
                               : Center(
@@ -124,7 +166,10 @@ class _HomepageState extends State<Homepage> {
                               ),
                               itemBuilder: (context) => [
                                 PopupMenuItem(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, MyRoutes.settings);
+                                    },
                                     child: ListTile(
                                       leading: Icon(
                                         Icons.settings_outlined,
@@ -138,6 +183,8 @@ class _HomepageState extends State<Homepage> {
                                 PopupMenuItem(
                                     onTap: () async {
                                       await FirebaseAuth.instance.signOut();
+                                      Navigator.pushReplacementNamed(
+                                          context, MyRoutes.auth);
                                     },
                                     child: ListTile(
                                       leading: Icon(
@@ -160,13 +207,14 @@ class _HomepageState extends State<Homepage> {
           ),
         ),
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).colorScheme.background,
           // title: Text("Homepage"),
           actions: [
             IconButton(
-              icon: Icon(Icons.brightness_4_outlined),
+              icon: Icon(
+                  isDark ? Icons.brightness_4 : Icons.brightness_2_outlined),
               onPressed: () async {
-                await FirebaseAuth.instance.signOut();
+                print("test");
               },
             )
           ],
@@ -312,8 +360,19 @@ class _HomepageState extends State<Homepage> {
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.08,
                       borderRadius: 15,
-                      onSubmit: () {
-                        Navigator.pushReplacementNamed(context, MyRoutes.chat);
+                      onSubmit: () async {
+                        String now = DateTime.now().toString().substring(0, 10);
+                        final historyRecord = await FirebaseFirestore.instance
+                            .collection("history")
+                            .add({
+                          "heading": "New Message at $now",
+                          "uid": FirebaseAuth.instance.currentUser!.uid,
+                          "time": Timestamp.now(),
+                        });
+                        print(historyRecord.id);
+
+                        Navigator.pushReplacementNamed(context, MyRoutes.chat,
+                            arguments: historyRecord.id);
                       },
                       text: "Swipe to Explore",
                       textStyle: TextStyle(
