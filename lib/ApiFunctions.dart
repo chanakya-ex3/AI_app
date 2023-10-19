@@ -1,7 +1,7 @@
 // import 'package:http/http.dart' as http;
 
 class ApiFunctions {
-  static var apiKey = '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';
+  static var apiKey = 'sk-QwOxI99v9a2D7bsBX8U3BlbkFJD2sjygrslJeUZhwpF6LP';
 }
 
 // curl \
