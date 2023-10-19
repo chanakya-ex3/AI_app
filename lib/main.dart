@@ -34,6 +34,7 @@ class _AiAPPState extends State<AiAPP> {
       builder: (context, child) {
         final themeProvider = Provider.of<ThemeProvider>(context);
         return MaterialApp(
+          
             debugShowCheckedModeBanner: false,
             title: 'BijuGPT',
             themeMode: themeProvider.themeMode,

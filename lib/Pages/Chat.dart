@@ -147,21 +147,23 @@ class _ChatPageState extends State<ChatPage> {
                                       itemCount: snapshot.data!.docs.length,
                                       itemBuilder: (context, index) {
                                         return ListTile(
-                                            leading: Icon(
-                                              CupertinoIcons.chat_bubble_2,
-                                              color: Colors.white,
-                                            ),
-                                            title: Text(
-                                              snapshot.data!.docs[index]
-                                                  ["heading"],
-                                              style: TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            trailing: Icon(
-                                              CupertinoIcons.delete_simple,
-                                              color: Colors.white,
-                                              size: 20,
-                                            ));
+                                          onTap: () {
+                                            Navigator.pushNamed(
+                                                context, MyRoutes.chat,
+                                                arguments: snapshot
+                                                    .data!.docs[index].id);
+                                          },
+                                          leading: Icon(
+                                            CupertinoIcons.chat_bubble_2,
+                                            color: Colors.white,
+                                          ),
+                                          title: Text(
+                                            snapshot.data!.docs[index]
+                                                ["heading"],
+                                            style:
+                                                TextStyle(color: Colors.white),
+                                          ),
+                                        );
                                       },
                                     );
                                   },
@@ -194,15 +196,23 @@ class _ChatPageState extends State<ChatPage> {
                               ),
                               itemBuilder: (context) => [
                                 PopupMenuItem(
-                                    onTap: () {},
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                          context, MyRoutes.settings);
+                                    },
                                     child: ListTile(
                                       leading: Icon(
                                         Icons.settings_outlined,
-                                        color: Colors.black,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                       title: Text(
                                         "Settings",
-                                        style: TextStyle(color: Colors.black),
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
                                       ),
                                     )),
                                 PopupMenuItem(
@@ -298,7 +308,6 @@ class _ChatPageState extends State<ChatPage> {
                                 height:
                                     MediaQuery.of(context).size.height * 0.05,
                               ),
-                              
                             ],
                           );
                         }
@@ -337,7 +346,6 @@ class _ChatPageState extends State<ChatPage> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.01,
                   ),
-                  
                 ],
               )
             : Center(

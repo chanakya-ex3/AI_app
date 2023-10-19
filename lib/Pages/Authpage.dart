@@ -1,3 +1,5 @@
+import 'package:ai_app/MyRoutes.dart';
+import 'package:ai_app/Widgets/ThemeSwitch.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -20,6 +22,7 @@ class _AuthPageState extends State<AuthPage> {
   static String email = "";
   static String password = "";
   final _key = new GlobalKey<FormState>();
+  TextEditingController _popupController = TextEditingController();
 
   Future<void> submit() async {
     if (_key.currentState!.validate()) {
@@ -81,17 +84,7 @@ class _AuthPageState extends State<AuthPage> {
         backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.background,
-          actions: [
-            IconButton(
-              icon: Icon(
-                  isDark ? Icons.brightness_4 : Icons.brightness_2_outlined),
-              onPressed: () {
-                setState(() {
-                  isDark = !isDark;
-                });
-              },
-            )
-          ],
+          actions: [ThemeSwitchButton()],
         ),
         body: Center(
           child: SingleChildScrollView(
@@ -205,7 +198,7 @@ class _AuthPageState extends State<AuthPage> {
                                               10.0), // Add rounded corners
                                           boxShadow: [
                                             BoxShadow(
-                                              color: Theme.of(context).colorScheme.onPrimary,
+                                              color: Colors.grey,
                                               blurRadius: 5.0,
                                               offset: Offset(0.0, 5.0),
                                             ),
@@ -311,9 +304,80 @@ class _AuthPageState extends State<AuthPage> {
                                 children: [
                                   isLoggedIn
                                       ? TextButton(
-                                          onPressed: () => print("forgot"),
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return Center(
+                                                    child: AlertDialog(
+                                                      actions: [
+                                                        TextFormField(
+                                                          decoration:
+                                                              InputDecoration(
+                                                                  hintText:
+                                                                      'Enter Your Email Address'),
+                                                          controller:
+                                                              _popupController,
+                                                        ),
+                                                        SizedBox(
+                                                          height: 10,
+                                                        ),
+                                                        ElevatedButton(
+                                                            style: ButtonStyle(
+                                                                backgroundColor:
+                                                                    MaterialStateProperty.all(Theme.of(
+                                                                            context)
+                                                                        .colorScheme
+                                                                        .secondary)),
+                                                            onPressed:
+                                                                () async {
+                                                              try {
+                                                                await FirebaseAuth
+                                                                    .instance
+                                                                    .sendPasswordResetEmail(
+                                                                        email: _popupController
+                                                                            .text)
+                                                                    .then(
+                                                                        (value) {
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .clearSnackBars();
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(SnackBar(
+                                                                          content:
+                                                                              Text("Reset Link Sent")));
+                                                                });
+                                                              } catch (e) {
+                                                                // print()
+                                                                print(e);
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .clearSnackBars();
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(SnackBar(
+                                                                        content:
+                                                                            Text("Unable to send reset link")));
+                                                              }
+                                                            },
+                                                            child: Text(
+                                                              "Send Reset Link",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white),
+                                                            ))
+                                                      ],
+                                                    ),
+                                                  );
+                                                });
+                                          },
                                           child: Text(
-                                            "Forgot password?",
+                                            "Forget Password",
+                                            style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary),
                                           ))
                                       : SizedBox(
                                           height: 0,
@@ -386,6 +450,10 @@ class _AuthPageState extends State<AuthPage> {
                                           isLoggedIn
                                               ? "Don't have an account?"
                                               : "You already have an Account?",
+                                          style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary),
                                         ),
                                         TextButton(
                                             onPressed: () {

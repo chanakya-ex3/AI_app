@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:ai_app/ApiFunctions.dart';
 import 'package:ai_app/Pages/Chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -151,7 +150,6 @@ class _NewMessageState extends State<NewMessage> {
 
           // print(response);
         } else {
-
           response = await getChatResponse(query);
         }
 

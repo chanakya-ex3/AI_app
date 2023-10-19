@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+// theme: ThemeData(
+//     textTheme: GoogleFonts.latoTextTheme(
+//       Theme.of(context).textTheme,
+//     ),
+//   ),
 
 class ThemeProvider extends ChangeNotifier {
   ThemeMode themeMode = ThemeMode.system;
@@ -10,7 +17,9 @@ class ThemeProvider extends ChangeNotifier {
 }
 
 class MyThemes {
-  static ThemeData theme = ThemeData().copyWith(
+  static ThemeData theme = ThemeData(
+    textTheme: GoogleFonts.hammersmithOneTextTheme(),
+  ).copyWith(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.black,
@@ -28,7 +37,9 @@ class MyThemes {
           onError: Colors.white,
           brightness: Brightness.light));
 
-  static ThemeData darktheme = ThemeData().copyWith(
+  static ThemeData darktheme = ThemeData(
+    textTheme: GoogleFonts.hammersmithOneTextTheme(),
+  ).copyWith(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.white,
