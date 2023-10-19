@@ -24,7 +24,6 @@ class _MessageBubbleState extends State<MessageBubble> {
 
   @override
   void initState() {
-
     // widget.data["type"] == "voice" && widget.data["response"] == ""
     //     ? speak(widget.data["response"]!)
     //     : null;
@@ -107,24 +106,47 @@ class _MessageBubbleState extends State<MessageBubble> {
                     child: Card(
                       color: const Color.fromARGB(255, 98, 175, 214),
                       child: ListTile(
-                        leading: ClipOval(
-                          child: Image.asset(
-                            "assets/images/dalle.jpg",
-                            fit: BoxFit.fill,
-                            height: 22,
-                          ),
-                        ),
-                        title: Text(
-                          "Dall-E",
-                          style: TextStyle(color: Colors.white),
+                        // leading: ,
+                        title: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            ClipOval(
+                              child: Image.asset(
+                                "assets/images/dalle.jpg",
+                                fit: BoxFit.fill,
+                                height: 22,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "Dall-E",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ],
                         ),
                         subtitle: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image.asset(
-                            widget.data["response"]!,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                            padding: const EdgeInsets.all(8.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: Image.network(
+                                widget.data["response"]!,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                  );
+                                },
+                                fit: BoxFit.fill,
+                              ),
+                            )),
                       ),
                     ),
                   ),

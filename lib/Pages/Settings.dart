@@ -1,4 +1,5 @@
 import 'package:ai_app/MyRoutes.dart';
+import 'package:ai_app/Widgets/ThemeSwitch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -51,6 +52,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.background,
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
@@ -64,10 +66,11 @@ class _SettingsPageState extends State<SettingsPage> {
           child: ListView(
             children: [
               Card(
-                color: Theme.of(context).colorScheme.background,
+                color: Colors.white,
                 child: ExpansionTile(
                   title: Text(
                     "Change Name",
+                    style: TextStyle(color: Colors.black),
                   ),
                   children: [
                     Padding(
@@ -92,11 +95,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               Card(
-                color: Theme.of(context).colorScheme.background,
+                color: Colors.white,
                 child: ListTile(
-                  title: Text(
-                    "Change Password",
-                  ),
+                  title: Text("Change Password",
+                      style: TextStyle(color: Colors.black)),
                   trailing: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -114,11 +116,10 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
               Card(
-                color: Theme.of(context).colorScheme.background,
+                color: Colors.white,
                 child: ListTile(
-                  title: Text(
-                    "Forgot Password",
-                  ),
+                  title: Text("Forgot Password",
+                      style: TextStyle(color: Colors.black)),
                   trailing: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ElevatedButton(
@@ -132,6 +133,17 @@ class _SettingsPageState extends State<SettingsPage> {
                           "Forgot Password",
                           style: TextStyle(color: Colors.white),
                         )),
+                  ),
+                ),
+              ),
+              Card(
+                color: Colors.white,
+                child: ListTile(
+                  title: Text("Theme Switch =>",
+                      style: TextStyle(color: Colors.black)),
+                  trailing: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ThemeSwitchButton(),
                   ),
                 ),
               ),

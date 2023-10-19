@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:ai_app/ApiFunctions.dart';
+import 'package:ai_app/Pages/Chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,27 @@ class _NewMessageState extends State<NewMessage> {
   bool _speechEnabled = false;
   String _lastWords = '';
 
+  Future<String> getImageResponse(String message) async {
+    final apiKey = ApiFunctions.apiKey; // Replace with your OpenAI API key
+
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/images/generations'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: jsonEncode({"prompt": message, "n": 1, "size": "1024x1024"}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      print(data);
+      return data['data'][0]['url'].toString();
+    } else {
+      throw Exception('Failed to get chat response');
+    }
+  }
+
   Future<String> getChatResponse(String message) async {
     final apiKey = ApiFunctions.apiKey; // Replace with your OpenAI API key
 
@@ -54,14 +76,46 @@ class _NewMessageState extends State<NewMessage> {
     }
   }
 
+  Future<String> _isImage(String message) async {
+    final apiKey = ApiFunctions.apiKey; // Replace with your OpenAI API key
+
+    final response = await http.post(
+      Uri.parse('https://api.openai.com/v1/chat/completions'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $apiKey',
+      },
+      body: jsonEncode({
+        "model": "gpt-3.5-turbo",
+        "messages": [
+          {
+            "role": "user",
+            "content":
+                "Does this message want to generate an AI image, art or picture? '$message'. Simply answer in a yes or no."
+          }
+        ]
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['choices'][0]['message']['content'].toString();
+    } else {
+      throw Exception('Failed to get chat response');
+    }
+  }
+
   void submit(String type) async {
     query = _controller.text;
-
+    print("sending");
+    print(type);
     if (query.isNotEmpty && query != "" && query.trim().isNotEmpty) {
       FocusScope.of(context).unfocus();
       setState(() {
         _controller.clear();
+        isQueryExmpty = true;
       });
+      String response = "";
       try {
         await FirebaseFirestore.instance
             .collection("history")
@@ -80,7 +134,6 @@ class _NewMessageState extends State<NewMessage> {
           "category": NewMessage.historyid,
           "time": Timestamp.now(),
         });
-        String response = await getChatResponse(query);
         await FirebaseFirestore.instance
             .collection("history")
             .doc(NewMessage.historyid)
@@ -89,16 +142,33 @@ class _NewMessageState extends State<NewMessage> {
           "heading":
               (query.length > 20) ? query.substring(0, 20) + "..." : query,
         });
+        // print(_isImage(query));
+        String temp = await _isImage(query);
+        if (temp.toLowerCase().contains("yes")) {
+          type = "image";
+
+          response = await getImageResponse(query);
+
+          // print(response);
+        } else {
+
+          response = await getChatResponse(query);
+        }
+
+        if (type == "voice") {
+          ChatPage.voiceNeed = true;
+        }
         await FirebaseFirestore.instance
             .collection("queries")
             .doc(data.id)
             .update({
+          "type": type,
           "response": response,
         });
       } catch (e) {
         ScaffoldMessenger.of(context).clearSnackBars();
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Invalid mail or password")));
+            .showSnackBar(SnackBar(content: Text("Unable to send message")));
       }
       print("done");
     }
@@ -123,7 +193,9 @@ class _NewMessageState extends State<NewMessage> {
     print("stopped 2");
     setState(() {});
     print("stopped 3");
+
     submit("voice");
+
     print("stopped 4");
   }
 
@@ -184,6 +256,7 @@ class _NewMessageState extends State<NewMessage> {
                       icon: Icon(_speechToText.isNotListening
                           ? Icons.mic_off
                           : Icons.mic),
+                      color: Colors.white,
                     )
                   : IconButton(
                       onPressed: () {

@@ -1,4 +1,5 @@
 import 'package:ai_app/MyRoutes.dart';
+import 'package:ai_app/Widgets/ThemeSwitch.dart';
 import 'package:ai_app/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gradient_slide_to_act/gradient_slide_to_act.dart';
+import 'package:http/http.dart';
 
 final _firestore = FirebaseFirestore.instance;
 
@@ -20,6 +22,17 @@ class _HomepageState extends State<Homepage> {
   String name = "";
   bool isLoaded = false;
   bool isDark = false;
+
+  void deleteARecord(String id) async {
+    await FirebaseFirestore.instance.collection("history").doc(id).delete();
+    final records = await FirebaseFirestore.instance
+        .collection("queries")
+        .where("category", isEqualTo: id)
+        .get();
+    for (var record in records.docs) {
+      await record.reference.delete();
+    }
+  }
 
   Future<String> getDocByID(String id) async {
     final nameD = await _firestore.collection("usernames").doc(id).get();
@@ -135,11 +148,18 @@ class _HomepageState extends State<Homepage> {
                                               style: TextStyle(
                                                   color: Colors.white),
                                             ),
-                                            trailing: Icon(
-                                              CupertinoIcons.delete_simple,
-                                              color: Colors.white,
-                                              size: 20,
-                                            ));
+                                            trailing: IconButton(
+                                                onPressed: () {
+                                                  // print(snapshot
+                                                  //     .data!.docs[index].id);
+                                                  deleteARecord(snapshot
+                                                      .data!.docs[index].id);
+                                                },
+                                                icon: Icon(
+                                                  CupertinoIcons.delete_simple,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                )));
                                       },
                                     );
                                   },
@@ -179,11 +199,16 @@ class _HomepageState extends State<Homepage> {
                                     child: ListTile(
                                       leading: Icon(
                                         Icons.settings_outlined,
-                                        color: Colors.black,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
                                       ),
                                       title: Text(
                                         "Settings",
-                                        style: TextStyle(color: Colors.black),
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary),
                                       ),
                                     )),
                                 PopupMenuItem(
@@ -215,15 +240,7 @@ class _HomepageState extends State<Homepage> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).colorScheme.background,
           // title: Text("Homepage"),
-          actions: [
-            IconButton(
-              icon: Icon(
-                  isDark ? Icons.brightness_4 : Icons.brightness_2_outlined),
-              onPressed: () async {
-                print("test");
-              },
-            )
-          ],
+          actions: [ThemeSwitchButton()],
         ),
         body: isLoaded
             ? Column(
@@ -363,9 +380,24 @@ class _HomepageState extends State<Homepage> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 8.0),
                     child: GradientSlideToAct(
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.blueAccent!,
+                            Theme.of(context).colorScheme.secondary,
+                          ]),
+                      dragableIconBackgroundColor:
+                          Theme.of(context).colorScheme.secondary,
+                      animationDuration: Duration(milliseconds: 200),
+                      draggableWidget: Padding(
+                        padding: const EdgeInsets.only(left: 16),
+                        child: Icon(Icons.arrow_forward_ios,
+                            color: Theme.of(context).colorScheme.onPrimary),
+                      ),
                       width: MediaQuery.of(context).size.width * 0.9,
                       height: MediaQuery.of(context).size.height * 0.08,
-                      borderRadius: 15,
+                      // borderRadius: 15,
                       onSubmit: () async {
                         String now = DateTime.now().toString().substring(0, 10);
                         final historyRecord = await FirebaseFirestore.instance

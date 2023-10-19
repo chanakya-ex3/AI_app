@@ -1,6 +1,7 @@
 import 'package:ai_app/MyRoutes.dart';
 import 'package:ai_app/Widgets/MessageBubble.dart';
 import 'package:ai_app/Widgets/NewMessage.dart';
+import 'package:ai_app/Widgets/ThemeSwitch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +11,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 final _firestore = FirebaseFirestore.instance;
 
 class ChatPage extends StatefulWidget {
+  static bool voiceNeed = false;
+
   ChatPage({super.key});
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -237,13 +240,7 @@ class _ChatPageState extends State<ChatPage> {
                   Navigator.pushReplacementNamed(context, MyRoutes.home);
                 },
                 icon: Icon(Icons.home)),
-            IconButton(
-              icon: Icon(
-                  isDark ? Icons.brightness_4 : Icons.brightness_2_outlined),
-              onPressed: () {
-                speak("Hello hari");
-              },
-            )
+            ThemeSwitchButton(),
           ],
         ),
         body: isLoaded
@@ -301,6 +298,7 @@ class _ChatPageState extends State<ChatPage> {
                                 height:
                                     MediaQuery.of(context).size.height * 0.05,
                               ),
+                              
                             ],
                           );
                         }
@@ -310,10 +308,19 @@ class _ChatPageState extends State<ChatPage> {
                           );
                         }
                         final loadedChat = snapshot.data!.docs;
+                        if (ChatPage.voiceNeed) {
+                          if (loadedChat[0]["response"] != "") {
+                            speak(loadedChat[0]["response"]);
+                          }
+
+                          ChatPage.voiceNeed = false;
+                        }
                         return ListView.builder(
                           reverse: true,
                           itemCount: loadedChat.length,
                           itemBuilder: (context, index) {
+                            // print(object)
+
                             return MessageBubble(convertDynamicMapToStringMap(
                                 loadedChat[index].data()));
                           },
@@ -326,7 +333,11 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                   NewMessage(
                     history: historyid,
-                  )
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.01,
+                  ),
+                  
                 ],
               )
             : Center(
